@@ -1,0 +1,218 @@
+import {
+  SignalStatus,
+  Visibility,
+  NavSignals,
+  BISPacketIDs,
+  NKASysNumbers,
+  BisIDs,
+} from "@/knp-common";
+
+/** Наименования пакетов от Комплект */
+const bisPacketName: { [K in typeof BISPacketIDs[number]]: string } = {
+  1: "Контроль соединения",
+  17: "1c измерения",
+  33: "Цифровая информация",
+  49: "Оперативное сообщение",
+  50: "Результаты контроля",
+  51: "Результаты решения НЗ",
+  52: "Значения невязок",
+  53: "Смещение ШВ Комплект-Н",
+  54: "Срыв слежения ПД",
+  65: "Метеопараметры",
+} as const;
+
+/** Наименование статуса радиовидимости */
+const VisibilityName: { [key in Visibility]: string } = {
+  [Visibility.GUARANTEED]: "Гарантирован",
+  [Visibility.MAYBE]: "Возможен",
+  [Visibility.OUT_OF_SIGHT]: "Вне зоны радиовидимости",
+};
+
+/** Наименование статуса приема */
+const SignalStatusName: { [key in SignalStatus]: string } = {
+  [SignalStatus.RECEIVE]: "Прием",
+  [SignalStatus.ERROR]: "Сбой",
+  [SignalStatus.OUT_OF_SIGHT]: VisibilityName[Visibility.OUT_OF_SIGHT],
+  [SignalStatus.UNAVAILABLE]: "Отсутствует",
+  [SignalStatus.UNDEFINED]: "Не определено",
+  [SignalStatus.NOT_ON_AIR]: "Не излучается",
+} as const;
+
+const NavSignalName: { [key in NavSignals]: string } = {
+  [NavSignals.L1OCd]: "L1OCd",
+  [NavSignals.L1OCp]: "L1OCp",
+  [NavSignals.L1OF]: "L1OF",
+  [NavSignals.L1SCd]: "L1SCd",
+  [NavSignals.L1SCp]: "L1SCp",
+  [NavSignals.L1SF]: "L1SF",
+  [NavSignals.L2OCp]: "L2OCp",
+  [NavSignals.L2OF]: "L2OF",
+  [NavSignals.L2SCd]: "L2SCd",
+  [NavSignals.L2SCp]: "L2SCp",
+  [NavSignals.L2SF]: "L2SF",
+  [NavSignals.L2_CSI]: "L2 КСИ",
+  [NavSignals.L3OCd]: "L3OCd",
+  [NavSignals.L3OCp]: "L3OCp",
+} as const;
+
+/** Полное название НКА */
+const NkaFullName: { [K in typeof NKASysNumbers[number]]: string } = {
+  1: "1 (730)",
+  2: "2 (747)",
+  3: "3 (744)",
+  4: "4 (759)",
+  5: "5 (756)",
+  6: "6 (733)",
+  7: "7 (745)",
+  8: "8 (743)",
+  9: "9 (702)",
+  10: "10 (723)",
+  11: "11 (705)",
+  12: "12 (728)",
+  13: "13 (721)",
+  14: "14 (752)",
+  15: "15 (757)",
+  16: "16 (736)",
+  17: "17 (751)",
+  18: "18 (754)",
+  19: "19 (720)",
+  20: "20 (719)",
+  21: "21 (755)",
+  22: "22 (735)",
+  23: "23 (732)",
+  24: "24 (760)",
+} as const;
+
+/** Полное название Комплект */
+const BisFullName: { [K in typeof BisIDs[number]]: string } = {
+  1: "СФУ №1",
+} as const;
+
+const NavSolutionName = {
+  false: "По всем НКА",
+  true: "Лучшее решение",
+} as const;
+
+const NavSolutionENUName = {
+  e: "E",
+  n: "N",
+  u: "U",
+  dt: "dt",
+} as const;
+
+/** Имена всех полей в кадре открытого сигнала с част. раздел. */
+const OFStrFieldNames = [
+  "m",
+  "p1",
+  "tk",
+  "x",
+  "vx",
+  "ax",
+  "reserve1",
+  "reserve2",
+  "b",
+  "tb",
+  "y",
+  "vy",
+  "ay",
+  "p2",
+  "p3",
+  "gamma",
+  "p",
+  "l",
+  "z",
+  "vz",
+  "az",
+  "tau",
+  "deltaTau",
+  "e",
+  "p4",
+  "ft",
+  "nt",
+  "n",
+  "nA",
+  "mCap",
+  "mA",
+  "nCap",
+  "tauS",
+  "n4",
+  "tauGps",
+  "c",
+  "tauA",
+  "lambda",
+  "deltaI",
+  "epsilon",
+  "omega",
+  "tLambda",
+  "deltaT",
+  "dDeltaT",
+  "h",
+  "b1",
+  "b2",
+  "kP",
+] as const;
+
+/** Имена всех полей в кадре открытого сигнала с част. раздел. на HTML */
+const OFStrFieldNamesHTML: { [K in typeof OFStrFieldNames[number]]: string } = {
+  m: "m",
+  p1: "P1",
+  tk: "t<sub>k</sub>",
+  x: "x<sub>n</sub>(t<sub>b</sub>)",
+  vx: "x<sub>n</sub>'(t<sub>b</sub>)",
+  ax: 'x<sub>n</sub>"(t<sub>b</sub>)',
+  reserve1: "резерв 1",
+  reserve2: "резерв 2",
+  b: "B<sub>n</sub>",
+  tb: "t<sub>b</sub>",
+  y: "y<sub>n</sub>(t<sub>b</sub>)",
+  vy: "y<sub>n</sub>'(t<sub>b</sub>)",
+  ay: 'y<sub>n</sub>"(t<sub>b</sub>)',
+  p2: "P2",
+  p3: "P3",
+  gamma: "&gamma;<sub>n</sub>(t<sub>b</sub>)",
+  p: "p",
+  l: "l<sub>n</sub>",
+  z: "z<sub>n</sub>(t<sub>b</sub>)",
+  vz: "z<sub>n</sub>'(t<sub>b</sub>)",
+  az: 'z<sub>n</sub>"(t<sub>b</sub>)',
+  tau: "&tau;<sub>n</sub>(t<sub>b</sub>)",
+  deltaTau: "&Delta;&tau;<sub>n</sub>",
+  e: "E<sub>n</sub>",
+  p4: "P3",
+  ft: "F<sub>T</sub>",
+  nt: "N<sub>T</sub>",
+  n: "n",
+  nA: "n<sup>A</sup>",
+  mCap: "M",
+  mA: "M<sub>n</sub><sup>a</sup>",
+  nCap: "N<sup>A</sup>",
+  tauS: "&tau;<sub>c</sub>",
+  n4: "N<sub>4</sub>",
+  tauGps: "&tau;<sub>GPS</sub>",
+  c: "C<sub>n</sub>",
+  tauA: "&tau;<sup>A</sup><sub>n</sub>",
+  lambda: "&lambda;<sup>A</sup><sub>n</sub>",
+  deltaI: "&Delta;i<sup>A</sup><sub>n</sub>",
+  epsilon: "&epsilon;<sup>A</sup><sub>n</sub>",
+  omega: "&omega;<sup>A</sup><sub>n</sub>",
+  tLambda: "t<sup>A</sup><sub>&lambda;<sup>n</sup></sub>",
+  deltaT: "&Delta;T<sup>A</sup><sub>n</sub>",
+  dDeltaT: "&Delta;T'<sup>A</sup><sub>n</sub>",
+  h: "H<sup>A</sup><sub>n</sub>",
+  b1: "B<sub>1</sub>",
+  b2: "B<sub>2</sub>",
+  kP: "KP",
+} as const;
+
+export {
+  bisPacketName,
+  VisibilityName,
+  SignalStatusName,
+  NavSignalName,
+  NkaFullName,
+  BisFullName,
+  NavSolutionName,
+  OFStrFieldNames,
+  OFStrFieldNamesHTML,
+  NavSolutionENUName,
+};

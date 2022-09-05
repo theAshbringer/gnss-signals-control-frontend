@@ -1,0 +1,87 @@
+stages:
+  - build
+  - release
+
+
+build-job:
+  stage: build
+  image: docker-hub.iss-reshetnev.ru/registry/languages/nodejs/node:16-buster-slim
+  retry: 2
+  script:
+    - npm install
+    - npm run build
+    - tar -zcvf knp_client.tar.gz dist
+    - export BUILD_VERSION=$(node -p "require('./package.json').version")-${CI_PIPELINE_IID}
+    - echo "BUILD_VERSION=$BUILD_VERSION"
+    - echo "BUILD_VERSION=$BUILD_VERSION" >> build.env
+  artifacts:
+    paths:
+      - knp_client.tar.gz
+    expire_in: 1 week
+    reports:
+      dotenv: build.env
+
+release-latest-to-gitab:
+  image: curlimages/curl:latest
+  stage: release
+  needs: 
+    - build-job
+  dependencies:
+    - build-job
+  script:
+   - 'curl --header "JOB-TOKEN: $CI_JOB_TOKEN" --upload-file knp_client.tar.gz "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/${KNP_CLIENT_LATEST_PACKAGE_NAME}/${BUILD_VERSION}/knp_client.tar.gz"'
+  when: manual
+  except:
+    - master
+
+tag-lastest-release:
+  image:
+    name: alpine/git:latest
+    entrypoint: [""]
+  stage: release
+  needs:
+    - build-job
+    - release-latest-to-gitab
+  dependencies:
+    - build-job
+  script:
+    - project_url=$(echo $CI_PROJECT_URL | sed 's/https:\/\///')
+    - git remote set-url origin https://oauth2:${DZHUMANOVA_GITLAB_REPO_TOKEN}@$project_url
+    - git checkout ${CI_COMMIT_BRANCH}
+    - git pull
+    - git tag $BUILD_VERSION
+    - git push -o ci.skip --tags
+  except:
+    - master
+
+release-stable-to-gitab:
+  image: curlimages/curl:latest
+  stage: release
+  needs: 
+    - build-job
+  dependencies:
+    - build-job
+  script:
+   - 'curl --header "JOB-TOKEN: $CI_JOB_TOKEN" --upload-file knp_client.tar.gz "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/${KNP_CLIENT_STABLE_PACKAGE_NAME}/${BUILD_VERSION}/knp_client.tar.gz"'
+  only:
+    - master
+
+tag-stable-release:
+  image:
+    name: alpine/git:latest
+    entrypoint: [""]
+  stage: release
+  needs:
+    - build-job
+    - release-stable-to-gitab
+  dependencies:
+    - build-job
+  script:
+    - project_url=$(echo $CI_PROJECT_URL | sed 's/https:\/\///')
+    - git remote set-url origin https://oauth2:${DZHUMANOVA_GITLAB_REPO_TOKEN}@$project_url
+    - git checkout ${CI_COMMIT_BRANCH}
+    - git pull
+    - git tag $BUILD_VERSION
+    - git push -o ci.skip --tags
+  only:
+    - master
