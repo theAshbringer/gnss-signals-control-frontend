@@ -57,8 +57,8 @@ npm run serve
 npm run build
 ```
 
-## Demo
-<a href="https://theashbringer.github.io/mesto/" target="_blank">GH Pages</a>
+<!-- ## Demo
+<a href="https://theashbringer.github.io//" target="_blank">GH Pages</a> -->
 
 
 ## Things to improve :pencil:
