@@ -1,5 +1,5 @@
 {
-  "name": "KNP",
+  "name": "gnss-signals-control-frontend",
   "version": "0.1.12",
   "private": true,
   "scripts": {
